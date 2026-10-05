@@ -11,9 +11,12 @@ public class PlayerControllers : MonoBehaviour
 
     private Rigidbody rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private LevelManager lm;
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
+        lm = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        isGrounded = true;
 	}
 
     bool getAction(string action)
@@ -28,28 +31,47 @@ public class PlayerControllers : MonoBehaviour
 		}
     }
     int dir = -1;
+    int prdir = -1;
     void Move()
     {
-        Vector3 vec = new Vector3();
-        var prdir = dir;
+
+        Vector3 euler = new Vector3(0, 0, 0);
+        Vector3 vec = Vector3.zero;
         if (getAction("left"))
         {
             vec = Vector3.back;
             dir = 0;
+            euler.y = -180;
         }
         else if (getAction("right"))
         {
             vec = Vector3.forward;
             dir = 1;
+            euler.y = 0;
         }
         else
             dir = -1;
+
+
         if (dir != -1)
         {
-		    transform.Translate(Vector3.back * speed * Time.deltaTime);
-            if (dir != prdir) transform.Rotate(0, dir == 0 ? -180 : 180, 0);
+            if (dir == 0)
+            {
+                euler.y = -180;
+            }
+            else
+            {
+                euler.y = 0;
+            }
+            //if (dir != prdir) transform.Rotate(0, dir == 1 ? -180 : 180, 0);
+            rb.AddForce(vec * speed);
         }
-        print(dir);
+        else if (prdir != dir)
+        {
+            rb.AddForce(-(vec * speed));
+
+		}
+            transform.eulerAngles = euler;
 
         prdir = dir;
 	}
@@ -60,7 +82,8 @@ public class PlayerControllers : MonoBehaviour
 
         if (getAction("up"))
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+			int stuff = ~GameManager.instance.gameData;
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Force);
             isGrounded = false;
         }
 
@@ -77,5 +100,12 @@ public class PlayerControllers : MonoBehaviour
         if (collision.gameObject.tag == "tocho")
         {
         }
-    }
+		if (collision.gameObject.tag == "coin")
+		{
+            Destroy(collision.gameObject);
+            GameManager.instance.gameData.totalCoins++;
+            lm.UpdateCoinsText();
+            lm.ActivateGameOver();
+		}
+	}
 }

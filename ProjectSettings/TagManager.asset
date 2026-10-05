@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ground
   - tocho
+  - coin
   layers:
   - Default
   - TransparentFX
