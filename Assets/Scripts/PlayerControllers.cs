@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerControllers : MonoBehaviour
 {
@@ -12,11 +13,14 @@ public class PlayerControllers : MonoBehaviour
     private Rigidbody rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private LevelManager lm;
+    
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
-        lm = GameObject.Find("LevelManager").GetComponent<LevelManager>();
-        isGrounded = true;
+        lm = GameManager.instance.lm;
+        lm.UpdateLivesText();
+		isGrounded = true;
+        doubleJump = true;
 	}
 
     bool getAction(string action)
@@ -76,14 +80,16 @@ public class PlayerControllers : MonoBehaviour
         prdir = dir;
 	}
     // Update is called once per frame
+    private bool doubleJump = false;
     void Update()
     {
         Move();
 
-        if (getAction("up"))
+        if (getAction("up") && (isGrounded))
         {
-			int stuff = ~GameManager.instance.gameData;
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Force);
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            if (!isGrounded)
+                doubleJump = false;
             isGrounded = false;
         }
 
@@ -94,18 +100,28 @@ public class PlayerControllers : MonoBehaviour
         if (collision.gameObject.tag == "ground")
         {
             isGrounded = true;
-            Debug.Log("Stay");
+			doubleJump = true;
+			Debug.Log("Stay");
         }
 
         if (collision.gameObject.tag == "tocho")
         {
         }
+	}
+    void OnTriggerEnter(Collider collision)
+    {
 		if (collision.gameObject.tag == "coin")
 		{
-            Destroy(collision.gameObject);
-            GameManager.instance.gameData.totalCoins++;
-            lm.UpdateCoinsText();
-            lm.ActivateGameOver();
+			Destroy(collision.gameObject);
+			GameManager.instance.gameData.totalCoins++;
+			lm.UpdateCoinsText();
+		}
+
+		if (collision.gameObject.tag == "death")
+        {
+            GameManager.instance.gameData.totalLives--;
+            lm.UpdateLivesText();
+            GameManager.ResetScene();
 		}
 	}
 }

@@ -2,12 +2,13 @@ using UnityEngine;
 
 public struct GameData
 {
-
+	private int _lives;
 	public int totalLives
 	{
-		get => totalLives;
+		get => _lives;
 		set
 		{
+			_lives = value;
 			if (value < 0)
 				GameManager.instance.OnDeath();
 		}
@@ -20,7 +21,7 @@ public struct GameData
 	{
 
 		GameManager.instance.gameData.totalLives = 3;
-		GameManager.instance.gameData.totalCoins = 0
+		GameManager.instance.gameData.totalCoins = 0;
 
 		return 1;
 	}

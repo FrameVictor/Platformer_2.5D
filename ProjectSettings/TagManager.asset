@@ -7,6 +7,7 @@ TagManager:
   - ground
   - tocho
   - coin
+  - death
   layers:
   - Default
   - TransparentFX
@@ -14,8 +15,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - DetectionArea
+  - EnemyLimit
   - 
   - 
   - 

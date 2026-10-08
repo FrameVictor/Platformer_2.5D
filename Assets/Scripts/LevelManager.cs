@@ -26,6 +26,8 @@ public class LevelManager : MonoBehaviour
 
 	public void UpdateLivesText()
     {
+        if (GameManager.instance.gameData.totalLives >= 0)
+		    livesText.text = "x" + GameManager.instance.gameData.totalLives;
 		//coinsText.text = GameManager.instance;
 	}
     public void MainMenuButton()
@@ -34,5 +36,6 @@ public class LevelManager : MonoBehaviour
     public void ActivateGameOver()
     {
         panelGameOver.SetActive(true);
+        Time.timeScale = 0f;
     }
 }
